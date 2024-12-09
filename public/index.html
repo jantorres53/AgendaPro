@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Agenda</title>
+
+  <!-- Enlace al manifiesto para PWA -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Estilos CSS embebidos -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin-bottom: 80px; /* Asegura que el contenido no quede cubierto por el footer */
+    }
+
+    /* Barra de navegación */
+    .navbar {
+      background-color: #007bff;
+      color: white;
+      padding: 15px;
+    }
+
+    .navbar .logo {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .navbar .icon {
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Estilo para el contenedor de la agenda */
+    #agenda {
+      padding: 20px;
+    }
+
+    /* Estilo para el botón flotante de agregar evento */
+    #addEventBtn {
+      position: fixed;
+      bottom: 80px; /* Ajuste para no quedar debajo del footer */
+      right: 20px;
+      font-size: 30px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #addEventBtn:hover {
+      background-color: #218838;
+    }
+
+    /* Estilo para las tarjetas de eventos */
+    .event-card {
+      background-color: white;
+      padding: 20px;
+      margin: 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .event-card h5 {
+      font-size: 20px;
+      margin-top: 0;
+    }
+
+    .event-card p {
+      font-size: 16px;
+    }
+
+    .event-card button {
+      margin-top: 10px;
+      padding: 8px 15px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .event-card button.editBtn {
+      background-color: #f39c12;
+    }
+
+    .event-card button.deleteBtn {
+      background-color: #e74c3c;
+    }
+
+    /* Estilo para el formulario de agregar/editar evento */
+    #eventCard {
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    #eventCard input, #eventCard textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #eventCard button {
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #eventCard button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Estilo para el footer */
+    footer {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .carousel-item img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra de navegación -->
+  <header class="navbar navbar-expand-lg">
+    <div class="container">
+      <div class="logo">Gestor de Agenda</div>
+      <div class="icon">
+        ☰
+      </div>
+    </div>
+  </header>
+
+  <!-- Título -->
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Gestor de Agenda</h1>
+
+    <!-- Carrusel de imágenes o contenido -->
+    <div id="carouselExample" class="carousel slide mb-4">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="https://via.placeholder.com/1200x400/007bff/ffffff?text=Agenda+Eventos" class="d-block w-100" alt="Imagen 1">
+        </div>
+        <div class="carousel-item">
+          <img src="https://via.placeholder.com/1200x400/28a745/ffffff?text=Agenda+Personalizada" class="d-block w-100" alt="Imagen 2">
+        </div>
+        <div class="carousel-item">
+          <img src="https://via.placeholder.com/1200x400/e74c3c/ffffff?text=Gestiona+Tus+Eventos" class="d-block w-100" alt="Imagen 3">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+
+    <!-- Contenedor de la agenda -->
+    <div id="agenda">
+      <div class="row" id="eventList">
+        <!-- Las cards de eventos se agregarán aquí dinámicamente -->
+      </div>
+
+      <!-- Botón flotante para agregar evento -->
+      <button id="addEventBtn">+</button>
+    </div>
+
+    <!-- Card para agregar o editar un evento -->
+    <div class="event-card" id="eventCard" style="display: none;">
+      <h3 id="formTitle">Agregar Evento</h3>
+      <form id="eventForm">
+        <input type="text" id="eventTitle" class="form-control" placeholder="Título del Evento" required>
+        <textarea id="eventDescription" class="form-control" placeholder="Descripción del Evento" required></textarea>
+        <button type="submit" class="btn btn-success mt-3">Guardar Evento</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 Gestor de Agenda | Todos los derechos reservados</p>
+  </footer>
+
+  <!-- Enlace a Bootstrap JS y Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+  <!-- Script para la lógica de agregar y editar eventos -->
+  <script src="/app.js"></script>
+
+</body>
+
+</html>
